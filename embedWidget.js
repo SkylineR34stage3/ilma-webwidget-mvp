@@ -7,7 +7,7 @@
     document.head.appendChild(cssLink);
 
     // Get the container and set up the widget
-    var container = document.getElementById('wahbvGQmDxsA'); // The ID of the div where the widget will be placed
+    var container = document.getElementById('wahbvGQmDxsA');
     var widgetContent = `
         <div id="car-widget">
             <h2>Car Listings</h2>
@@ -25,8 +25,20 @@
 
     // Load the JavaScript file
     var scriptTag = document.createElement('script');
-    scriptTag.src = 'https://ilma-webwidget-mvp.vercel.app/script.js'; // Replace with the actual URL
+    scriptTag.src = 'https://ilma-webwidget-mvp.vercel.app/script.js';
     document.body.appendChild(scriptTag);
+
+    // Function to get URL query parameters
+    function getQueryParams() {
+        var params = {};
+        var queryString = window.location.search.substring(1);
+        var vars = queryString.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+        }
+        return params;
+    }
 
     // Wait until the script is loaded before executing the rest of the code
     scriptTag.onload = function() {
@@ -41,16 +53,13 @@
             fetchCars(filters);
         });
 
-        // Apply filters if they are provided
-        var carMake = container.getAttribute('data-make');
-        var yearRange = container.getAttribute('data-year-range');
-        if (carMake || yearRange) {
-            var filters = {};
-            if (carMake) filters.carMakers = carMake;
-            if (yearRange) filters.yearRange = yearRange;
-            fetchCars(filters);
-        } else {
-            fetchCars(); // Fetch without filters
-        }
+        // Apply URL query parameters or data attributes as filters
+        var queryParams = getQueryParams();
+        var carMake = queryParams.carMake || container.getAttribute('data-make');
+        var yearRange = queryParams.yearRange || container.getAttribute('data-year-range');
+        var filters = {};
+        if (carMake) filters.carMakers = carMake;
+        if (yearRange) filters.yearRange = yearRange;
+        fetchCars(filters);
     };
 })();
